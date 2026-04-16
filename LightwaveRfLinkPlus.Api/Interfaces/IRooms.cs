@@ -21,6 +21,7 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Gets a room by its id
 		/// </summary>
+		/// <param name="id">The room id.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Get("/room/{id}")]
 		public Task<Room> GetAsync(
@@ -30,6 +31,7 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Creates a room
 		/// </summary>
+		/// <param name="room">The room payload.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Post("/room")]
 		public Task<Room> CreateAsync(
@@ -39,6 +41,8 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Updates a room by its id
 		/// </summary>
+		/// <param name="id">The room id.</param>
+		/// <param name="room">The room payload.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Put("/room/{id}")]
 		public Task<Room> UpdateAsync(
@@ -49,6 +53,7 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Deletes a room by its id
 		/// </summary>
+		/// <param name="id">The room id.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Delete("/room/{id}")]
 		public Task DeleteAsync(

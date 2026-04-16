@@ -26,7 +26,8 @@ namespace LightwaveRfLinkPlus.Api.Test
 			var appsettingsAsJson = await File
 				.ReadAllTextAsync(_fileInfo.FullName, cancellationToken)
 				.ConfigureAwait(false);
-			return JsonSerializer.Deserialize<LightwaveRfLinkPlusCredentials>(appsettingsAsJson);
+			return JsonSerializer.Deserialize<LightwaveRfLinkPlusCredentials>(appsettingsAsJson)
+				?? new LightwaveRfLinkPlusCredentials();
 		}
 
 		public async Task<string> GetInitialRefreshTokenAsync(CancellationToken cancellationToken)

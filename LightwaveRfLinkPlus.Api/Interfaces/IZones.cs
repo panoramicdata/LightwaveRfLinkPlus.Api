@@ -21,6 +21,7 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Gets a zone by its id
 		/// </summary>
+		/// <param name="id">The zone id.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Get("/zone/{id}")]
 		public Task<Zone> GetAsync(
@@ -30,6 +31,7 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Creates a zone
 		/// </summary>
+		/// <param name="zone">The zone payload.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Post("/zone")]
 		public Task<Zone> CreateAsync(
@@ -39,6 +41,8 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Updates a zone by its id
 		/// </summary>
+		/// <param name="id">The zone id.</param>
+		/// <param name="zone">The zone payload.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Put("/zone/{id}")]
 		public Task<Zone> UpdateAsync(
@@ -49,6 +53,7 @@ namespace LightwaveRfLinkPlus.Api.Interfaces
 		/// <summary>
 		/// Deletes a zone by its id
 		/// </summary>
+		/// <param name="id">The zone id.</param>
 		/// <param name="cancellationToken">The cancellationToken</param>
 		[Delete("/zone/{id}")]
 		public Task DeleteAsync(

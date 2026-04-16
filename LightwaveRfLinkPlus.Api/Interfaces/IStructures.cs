@@ -5,11 +5,15 @@ using System.Threading.Tasks;
 
 namespace LightwaveRfLinkPlus.Api.Interfaces
 {
+	/// <summary>
+	/// Structures interface.
+	/// </summary>
 	public interface IStructures
 	{
 		/// <summary>
 		/// Get the structure list
 		/// </summary>
+		/// <param name="cancellationToken">The cancellation token.</param>
 		[Get("/structures")]
 		public Task<StructureList> GetStructureListAsync(CancellationToken cancellationToken);
 

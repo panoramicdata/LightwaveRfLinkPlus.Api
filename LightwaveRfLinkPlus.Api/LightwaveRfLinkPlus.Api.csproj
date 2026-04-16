@@ -1,38 +1,39 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<LangVersion>8.0</LangVersion>
-		<Nullable>enable</Nullable>
-		<PackageIcon>Icon.png</PackageIcon>
-		<PackageProjectUrl>https://github.com/panoramicdata/LightwaveRfLinkPlus.Api</PackageProjectUrl>
-		<RepositoryUrl>git@github.com:panoramicdata/LightwaveRfLinkPlus.Api.git</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageTags>LightwaveRf Lightwave RF Link Plus</PackageTags>
-		<PackageReleaseNotes>Initial release</PackageReleaseNotes>
-		<Copyright>Panoramic Data Limited 2019</Copyright>
-		<Authors>David Bond</Authors>
-		<Company>Panoramic Data Limited</Company>
-		<Description>Nuget package for the LightwaveRF Link Plus API</Description>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="Icon.png" Pack="true" PackagePath="" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Nerdbank.GitVersioning" Version="3.5.107">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.26" />
-		<PackageReference Include="Refit" Version="4.8.14" />
-	</ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/panoramicdata/LightwaveRfLinkPlus.Api</PackageProjectUrl>
+    <RepositoryUrl>git@github.com:panoramicdata/LightwaveRfLinkPlus.Api.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>LightwaveRf Lightwave RF Link Plus</PackageTags>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <Copyright>Panoramic Data Limited 2019</Copyright>
+    <Authors>David Bond</Authors>
+    <Company>Panoramic Data Limited</Company>
+    <Description>Nuget package for the LightwaveRF Link Plus API</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageId>LightwaveRfLinkPlus.Api</PackageId>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Icon.png" Pack="true" PackagePath="/" />
+    <None Include="..\README.md" Pack="true" PackagePath="/" Link="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Refit" />
+    <PackageReference Include="Refit.Newtonsoft.Json" />
+  </ItemGroup>
 </Project>

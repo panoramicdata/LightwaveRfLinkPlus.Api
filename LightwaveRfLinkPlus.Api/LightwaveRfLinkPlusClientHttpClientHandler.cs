@@ -70,8 +70,12 @@ namespace LightwaveRfLinkPlus.Api
 						tokenRequestMessage.Headers.Add("Authorization", $"basic {basic}");
 
 						var tokenResponse = await base.SendAsync(tokenRequestMessage, cancellationToken).ConfigureAwait(false);
-						string authResponse = await tokenResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+						string authResponse = await tokenResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 						_authToken = JsonConvert.DeserializeObject<AuthToken>(authResponse);
+						if (_authToken == null)
+						{
+							throw new InvalidOperationException("Could not deserialize auth token response.");
+						}
 
 						// Having fetched the AuthToken, it is important that we write this back out to the accesstoken repository
 						await optionsRepository
@@ -92,7 +96,7 @@ namespace LightwaveRfLinkPlus.Api
 				}
 				else
 				{
-					_logger?.LogError($"{guid} failure: {await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)}");
+					_logger?.LogError($"{guid} failure: {await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}");
 				}
 				return httpResponseMessage;
 			}

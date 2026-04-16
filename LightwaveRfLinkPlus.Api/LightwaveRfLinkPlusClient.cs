@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace LightwaveRfLinkPlus.Api
 {
+	/// <summary>
+	/// Lightwave RF Link Plus API client.
+	/// </summary>
 	public class LightwaveRfLinkPlusClient : IDisposable
 	{
 		private readonly LightwaveRfLinkPlusClientHttpClientHandler _httpClientHandler;
@@ -24,7 +27,7 @@ namespace LightwaveRfLinkPlus.Api
 
 			var refitSettings = new RefitSettings
 			{
-				ContentSerializer = new JsonContentSerializer(
+				ContentSerializer = new NewtonsoftJsonContentSerializer(
 				new JsonSerializerSettings
 				{
 					NullValueHandling = NullValueHandling.Ignore
@@ -82,8 +85,12 @@ namespace LightwaveRfLinkPlus.Api
 			=> Structures.GetStructureListAsync(cancellationToken);
 
 		#region IDisposable Support
-		private bool _disposedValue = false; // To detect redundant calls
+		private bool _disposedValue; // To detect redundant calls
 
+		/// <summary>
+		/// Disposes managed resources.
+		/// </summary>
+		/// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!_disposedValue)
@@ -98,7 +105,9 @@ namespace LightwaveRfLinkPlus.Api
 			}
 		}
 
-		// This code added to correctly implement the disposable pattern.
+		/// <summary>
+		/// Disposes the client and suppresses finalization.
+		/// </summary>
 		public void Dispose()
 		{
 			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
