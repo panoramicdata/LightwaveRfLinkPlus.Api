@@ -24,6 +24,14 @@ namespace LightwaveRfLinkPlus.Api
 
 		protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
+			if (_options.IsReadOnly
+				&& request.Method != HttpMethod.Get
+				&& request.Method != HttpMethod.Head
+				&& request.Method != HttpMethod.Options)
+			{
+				throw new InvalidOperationException($"The client is read-only (IsReadOnly is true): {request.Method} requests are not allowed.");
+			}
+
 			var guid = Guid.NewGuid();
 			try
 			{

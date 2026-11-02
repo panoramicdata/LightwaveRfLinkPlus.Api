@@ -18,5 +18,10 @@ namespace LightwaveRfLinkPlus.Api
 		/// An optional logger factory
 		/// </summary>
 		public ILoggerFactory? LoggerFactory { get; set; }
+
+		/// <summary>
+		/// Whether the client refuses every request that is not a read (GET, HEAD or OPTIONS).
+		/// </summary>
+		public bool IsReadOnly { get; set; }
 	}
 }
