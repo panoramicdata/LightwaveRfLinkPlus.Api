@@ -12,7 +12,7 @@ namespace LightwaveRfLinkPlus.Api.Test
 	/// </summary>
 	public class ReadOnlyOptionTests
 	{
-		private sealed class SentinelException : Exception
+		public sealed class SentinelException : Exception
 		{
 		}
 
@@ -20,14 +20,27 @@ namespace LightwaveRfLinkPlus.Api.Test
 		{
 			public int CallCount { get; private set; }
 
-			public Task<string> GetBasicAsync(CancellationToken cancellationToken) => throw new SentinelException();
+			public Task<string> GetBasicAsync(CancellationToken cancellationToken)
+			{
+				cancellationToken.ThrowIfCancellationRequested();
+				throw new SentinelException();
+			}
 
-			public Task<string> GetInitialRefreshTokenAsync(CancellationToken cancellationToken) => throw new SentinelException();
+			public Task<string> GetInitialRefreshTokenAsync(CancellationToken cancellationToken)
+			{
+				cancellationToken.ThrowIfCancellationRequested();
+				throw new SentinelException();
+			}
 
-			public Task SetAuthTokenAsync(AuthToken newValue, CancellationToken cancellationToken) => throw new SentinelException();
+			public Task SetAuthTokenAsync(AuthToken newValue, CancellationToken cancellationToken)
+			{
+				cancellationToken.ThrowIfCancellationRequested();
+				throw new SentinelException();
+			}
 
 			public Task<AuthToken?> GetAuthTokenAsync(CancellationToken cancellationToken)
 			{
+				cancellationToken.ThrowIfCancellationRequested();
 				CallCount++;
 				throw new SentinelException();
 			}
