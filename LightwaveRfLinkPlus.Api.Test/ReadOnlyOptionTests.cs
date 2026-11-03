@@ -34,6 +34,7 @@ namespace LightwaveRfLinkPlus.Api.Test
 
 			public Task SetAuthTokenAsync(AuthToken newValue, CancellationToken cancellationToken)
 			{
+				ArgumentNullException.ThrowIfNull(newValue);
 				cancellationToken.ThrowIfCancellationRequested();
 				throw new SentinelException();
 			}
