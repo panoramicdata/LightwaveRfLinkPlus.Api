@@ -19,7 +19,11 @@ namespace LightwaveRfLinkPlus.Api.Test
 		private sealed class XunitLogger(string categoryName, ITestOutputHelper testOutputHelper) : ILogger
 		{
 			/// <inheritdoc />
-			public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+			public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+			{
+				testOutputHelper.WriteLine($"[Scope] {categoryName}: {state}");
+				return null;
+			}
 
 			/// <inheritdoc />
 			public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
@@ -34,7 +38,7 @@ namespace LightwaveRfLinkPlus.Api.Test
 
 				try
 				{
-					testOutputHelper.WriteLine($"[{logLevel}] {categoryName}: {formatter(state, exception)}");
+					testOutputHelper.WriteLine($"[{logLevel}] {categoryName} ({eventId.Id}): {formatter(state, exception)}");
 					if (exception is not null)
 					{
 						testOutputHelper.WriteLine(exception.ToString());
