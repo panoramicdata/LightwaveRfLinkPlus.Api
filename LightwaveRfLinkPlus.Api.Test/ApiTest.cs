@@ -1,9 +1,10 @@
-﻿using Divergic.Logging.Xunit;
+﻿using Microsoft.Extensions.Logging;
 using System.IO;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace LightwaveRfLinkPlus.Api.Test
 {
+	[Trait("Category", "Integration")]
 	public class ApiTest
 	{
 		public LightwaveRfLinkPlusClient Client { get; }
@@ -15,7 +16,7 @@ namespace LightwaveRfLinkPlus.Api.Test
 			var options = new LightwaveRfLinkPlusClientOptions
 			{
 				Repository = new AppSettingsCredentialsRepository(new FileInfo("../../../appsettings.json")),
-				LoggerFactory = LogFactory.Create(testOutputHelper)
+				LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Debug).AddProvider(new XunitLoggerProvider(testOutputHelper)))
 			};
 
 			Client = new LightwaveRfLinkPlusClient(options);
