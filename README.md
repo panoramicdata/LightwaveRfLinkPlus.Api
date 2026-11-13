@@ -6,3 +6,5 @@
 
 # LightwaveRfLinkPlus.Api
 Lightwave RF Link Plus API nuget package
+
+Supports .NET 11.0.
