@@ -29,26 +29,34 @@ namespace LightwaveRfLinkPlus.Api.Test
 			public Task<AuthToken?> GetAuthTokenAsync(CancellationToken cancellationToken) => Task.FromResult(token);
 		}
 
-		private sealed class ListLogger(List<string> messages) : ILogger, ILoggerProvider, ILoggerFactory
+		private sealed class ListLogger(List<string> messages) : ILogger
 		{
-			public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+			public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+			{
+				messages.Add($"scope {state}");
+				return null;
+			}
 
-			public bool IsEnabled(LogLevel logLevel) => true;
+			public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
 
 			public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
 				=> messages.Add($"{logLevel}: {formatter(state, exception)}");
+		}
 
-			public ILogger CreateLogger(string categoryName) => this;
-
-			public void AddProvider(ILoggerProvider provider)
+		private sealed class ListLoggerFactory(List<string> messages) : ILoggerFactory
+		{
+			public ILogger CreateLogger(string categoryName)
 			{
+				messages.Add($"category {categoryName}");
+				return new ListLogger(messages);
 			}
+
+			public void AddProvider(ILoggerProvider provider) => ArgumentNullException.ThrowIfNull(provider);
 
 			public void Dispose()
 			{
 			}
 		}
-
 		private sealed class LoopbackServer : IDisposable
 		{
 			private readonly HttpListener _listener = new();
@@ -90,7 +98,7 @@ namespace LightwaveRfLinkPlus.Api.Test
 			=> new()
 			{
 				Repository = new MemoryRepository(new AuthToken { AccessToken = "abc" }, "b", "r"),
-				LoggerFactory = new ListLogger(messages),
+				LoggerFactory = new ListLoggerFactory(messages),
 				IsReadOnly = isReadOnly
 			};
 
