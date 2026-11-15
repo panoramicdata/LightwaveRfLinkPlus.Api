@@ -15,7 +15,36 @@ namespace LightwaveRfLinkPlus.Api.Test
 		[Fact]
 		public async Task CrudSucceeds()
 		{
-			// Should not throw an exception
+			await AssertExistingZonesAreValidAsync().ConfigureAwait(false);
+
+			var structureId = await GetFirstStructureIdAsync().ConfigureAwait(false);
+			var zoneCreationDto = new Zone
+			{
+				Name = "TestZoneName",
+				Type = "TestZoneType",
+				ParentGroups = new List<string> { structureId },
+				Order = new List<string> { structureId }
+			};
+			var createdZone = await Client
+				.Zones
+				.CreateAsync(zoneCreationDto, CancellationToken.None)
+				.ConfigureAwait(false);
+
+			try
+			{
+				await AssertFetchUpdateRefetchAsync(createdZone.Id, zoneCreationDto.Name).ConfigureAwait(false);
+			}
+			finally
+			{
+				await Client
+					.Zones
+					.DeleteAsync(createdZone.Id, CancellationToken.None)
+					.ConfigureAwait(false);
+			}
+		}
+
+		private async Task AssertExistingZonesAreValidAsync()
+		{
 			var zoneList = await Client
 				.Zones
 				.GetAllAsync(CancellationToken.None)
@@ -34,69 +63,23 @@ namespace LightwaveRfLinkPlus.Api.Test
 				Assert.All(zone.ParentGroups, parentGroup => Assert.False(string.IsNullOrWhiteSpace(parentGroup)));
 				Assert.All(zone.Rooms, room => Assert.False(string.IsNullOrWhiteSpace(room)));
 			});
+		}
 
-			// Get structure
-			var structureList = await Client
-				.Structures
-				.GetStructureListAsync(CancellationToken.None)
-				.ConfigureAwait(false);
-			Assert.NotEmpty(structureList.StructureIds);
+		private async Task AssertFetchUpdateRefetchAsync(string id, string expectedName)
+		{
+			var fetched = await Client.Zones.GetAsync(id, CancellationToken.None).ConfigureAwait(false);
+			Assert.Equal(expectedName, fetched.Name);
+			Assert.Equal(id, fetched.Id);
 
-			// Create a new zone
-			var zoneCreationDto = new Zone
-			{
-				Name = "TestZoneName",
-				Type = "TestZoneType",
-				ParentGroups = new List<string>
-				{
-					structureList.StructureIds[0]
-				},
-				Order = new List<string>
-				{
-					structureList.StructureIds[0]
-				}
-			};
-			var createdZone = await Client
-				.Zones
-				.CreateAsync(zoneCreationDto, CancellationToken.None)
-				.ConfigureAwait(false);
+			const string newName = "ZZXXX";
+			fetched.Name = newName;
+			var updated = await Client.Zones.UpdateAsync(id, fetched, CancellationToken.None).ConfigureAwait(false);
+			Assert.Equal(newName, updated.Name);
+			Assert.Equal(id, updated.Id);
 
-			try
-			{
-				// Fetch it
-				var refetchedZone1 = await Client
-					.Zones
-					.GetAsync(createdZone.Id, CancellationToken.None)
-					.ConfigureAwait(false);
-				Assert.Equal(zoneCreationDto.Name, refetchedZone1.Name);
-				Assert.Equal(createdZone.Id, refetchedZone1.Id);
-
-				// Update it
-				const string newName = "ZZXXX";
-				refetchedZone1.Name = newName;
-				var updatedZone = await Client
-					.Zones
-					.UpdateAsync(createdZone.Id, refetchedZone1, CancellationToken.None)
-					.ConfigureAwait(false);
-				Assert.Equal(newName, updatedZone.Name);
-				Assert.Equal(createdZone.Id, updatedZone.Id);
-
-				// Fetch it again
-				var refetchedZone2 = await Client
-					.Zones
-					.GetAsync(createdZone.Id, CancellationToken.None)
-					.ConfigureAwait(false);
-				Assert.Equal(newName, refetchedZone2.Name);
-				Assert.Equal(createdZone.Id, refetchedZone2.Id);
-			}
-			finally
-			{
-				// Delete it
-				await Client
-					.Zones
-					.DeleteAsync(createdZone.Id, CancellationToken.None)
-					.ConfigureAwait(false);
-			}
+			var refetched = await Client.Zones.GetAsync(id, CancellationToken.None).ConfigureAwait(false);
+			Assert.Equal(newName, refetched.Name);
+			Assert.Equal(id, refetched.Id);
 		}
 	}
 }
