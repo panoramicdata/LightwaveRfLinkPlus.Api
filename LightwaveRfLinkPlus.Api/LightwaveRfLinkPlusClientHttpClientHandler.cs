@@ -24,13 +24,7 @@ namespace LightwaveRfLinkPlus.Api
 
 		protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
-			if (_options.IsReadOnly
-				&& request.Method != HttpMethod.Get
-				&& request.Method != HttpMethod.Head
-				&& request.Method != HttpMethod.Options)
-			{
-				throw new InvalidOperationException($"The client is read-only (IsReadOnly is true): {request.Method} requests are not allowed.");
-			}
+			ThrowIfReadOnlyViolation(request);
 
 			var guid = Guid.NewGuid();
 			try
@@ -46,20 +40,36 @@ namespace LightwaveRfLinkPlus.Api
 				// Complete the action
 				_logger?.LogDebug($"{guid} sending");
 				var httpResponseMessage = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-				if (httpResponseMessage.IsSuccessStatusCode)
-				{
-					_logger?.LogDebug($"{guid} success");
-				}
-				else
-				{
-					_logger?.LogError($"{guid} failure: {await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}");
-				}
+				await LogOutcomeAsync(guid, httpResponseMessage, cancellationToken).ConfigureAwait(false);
 				return httpResponseMessage;
 			}
 			finally
 			{
 				_logger?.LogDebug($"{guid} complete.");
 			}
+		}
+
+		private void ThrowIfReadOnlyViolation(HttpRequestMessage request)
+		{
+			var isRead = request.Method == HttpMethod.Get
+				|| request.Method == HttpMethod.Head
+				|| request.Method == HttpMethod.Options;
+			if (_options.IsReadOnly && !isRead)
+			{
+				throw new InvalidOperationException($"The client is read-only (IsReadOnly is true): {request.Method} requests are not allowed.");
+			}
+		}
+
+		private async Task LogOutcomeAsync(Guid guid, HttpResponseMessage response, CancellationToken cancellationToken)
+		{
+			if (response.IsSuccessStatusCode)
+			{
+				_logger?.LogDebug($"{guid} success");
+				return;
+			}
+
+			var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+			_logger?.LogError($"{guid} failure: {body}");
 		}
 
 		private async Task<AuthToken> GetOrFetchAuthTokenAsync(CancellationToken cancellationToken)

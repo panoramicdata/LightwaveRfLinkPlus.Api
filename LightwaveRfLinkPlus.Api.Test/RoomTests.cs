@@ -15,7 +15,36 @@ namespace LightwaveRfLinkPlus.Api.Test
 		[Fact]
 		public async Task CrudSucceeds()
 		{
-			// Should not throw an exception
+			await AssertExistingRoomsAreValidAsync().ConfigureAwait(false);
+
+			var structureId = await GetFirstStructureIdAsync().ConfigureAwait(false);
+			var roomCreationDto = new Room
+			{
+				Name = "TestRoomName",
+				Type = "TestRoomType",
+				ParentGroups = new List<string> { structureId },
+				Order = new List<string> { structureId }
+			};
+			var createdRoom = await Client
+				.Rooms
+				.CreateAsync(roomCreationDto, CancellationToken.None)
+				.ConfigureAwait(false);
+
+			try
+			{
+				await AssertRoomUpdateCycleAsync(createdRoom.Id, roomCreationDto.Name).ConfigureAwait(false);
+			}
+			finally
+			{
+				await Client
+					.Rooms
+					.DeleteAsync(createdRoom.Id, CancellationToken.None)
+					.ConfigureAwait(false);
+			}
+		}
+
+		private async Task AssertExistingRoomsAreValidAsync()
+		{
 			var roomList = await Client
 				.Rooms
 				.GetAllAsync(CancellationToken.None)
@@ -34,69 +63,23 @@ namespace LightwaveRfLinkPlus.Api.Test
 				Assert.All(room.ParentGroups, parentGroup => Assert.False(string.IsNullOrWhiteSpace(parentGroup)));
 				Assert.All(room.ScriptSets, Assert.NotNull);
 			});
+		}
 
-			// Get structure
-			var structureList = await Client
-				.Structures
-				.GetStructureListAsync(CancellationToken.None)
-				.ConfigureAwait(false);
-			Assert.NotEmpty(structureList.StructureIds);
+		private async Task AssertRoomUpdateCycleAsync(string id, string expectedName)
+		{
+			var first = await Client.Rooms.GetAsync(id, CancellationToken.None).ConfigureAwait(false);
+			Assert.Equal(expectedName, first.Name);
+			Assert.Equal(id, first.Id);
 
-			// Create a new room
-			var roomCreationDto = new Room
-			{
-				Name = "TestRoomName",
-				Type = "TestRoomType",
-				ParentGroups = new List<string>
-				{
-					structureList.StructureIds[0]
-				},
-				Order = new List<string>
-				{
-					structureList.StructureIds[0]
-				}
-			};
-			var createdRoom = await Client
-				.Rooms
-				.CreateAsync(roomCreationDto, CancellationToken.None)
-				.ConfigureAwait(false);
+			const string newName = "ZZXXX";
+			first.Name = newName;
+			var changed = await Client.Rooms.UpdateAsync(id, first, CancellationToken.None).ConfigureAwait(false);
+			Assert.Equal(newName, changed.Name);
+			Assert.Equal(id, changed.Id);
 
-			try
-			{
-				// Fetch it
-				var refetchedRoom1 = await Client
-					.Rooms
-					.GetAsync(createdRoom.Id, CancellationToken.None)
-					.ConfigureAwait(false);
-				Assert.Equal(roomCreationDto.Name, refetchedRoom1.Name);
-				Assert.Equal(createdRoom.Id, refetchedRoom1.Id);
-
-				// Update it
-				const string newName = "ZZXXX";
-				refetchedRoom1.Name = newName;
-				var updatedRoom = await Client
-					.Rooms
-					.UpdateAsync(createdRoom.Id, refetchedRoom1, CancellationToken.None)
-					.ConfigureAwait(false);
-				Assert.Equal(newName, updatedRoom.Name);
-				Assert.Equal(createdRoom.Id, updatedRoom.Id);
-
-				// Fetch it again
-				var refetchedRoom2 = await Client
-					.Rooms
-					.GetAsync(createdRoom.Id, CancellationToken.None)
-					.ConfigureAwait(false);
-				Assert.Equal(newName, refetchedRoom2.Name);
-				Assert.Equal(createdRoom.Id, refetchedRoom2.Id);
-			}
-			finally
-			{
-				// Delete it
-				await Client
-					.Rooms
-					.DeleteAsync(createdRoom.Id, CancellationToken.None)
-					.ConfigureAwait(false);
-			}
+			var second = await Client.Rooms.GetAsync(id, CancellationToken.None).ConfigureAwait(false);
+			Assert.Equal(newName, second.Name);
+			Assert.Equal(id, second.Id);
 		}
 	}
 }

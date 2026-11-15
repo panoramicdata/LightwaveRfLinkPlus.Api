@@ -21,5 +21,15 @@ namespace LightwaveRfLinkPlus.Api.Test
 
 			Client = new LightwaveRfLinkPlusClient(options);
 		}
+
+		protected async Task<string> GetFirstStructureIdAsync()
+		{
+			var structureList = await Client
+				.Structures
+				.GetStructureListAsync(CancellationToken.None)
+				.ConfigureAwait(false);
+			Assert.NotEmpty(structureList.StructureIds);
+			return structureList.StructureIds[0];
+		}
 	}
 }
