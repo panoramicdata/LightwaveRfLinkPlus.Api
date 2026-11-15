@@ -20,13 +20,20 @@ namespace LightwaveRfLinkPlus.Api.Test
 	{
 		private sealed class MemoryRepository(AuthToken? token, string basic, string refresh) : ICredentialsRepository
 		{
-			public Task<string> GetBasicAsync(CancellationToken cancellationToken) => Task.FromResult(basic);
+			public Task<string> GetBasicAsync(CancellationToken cancellationToken) => Task.FromResult(Checked(cancellationToken, basic));
 
-			public Task<string> GetInitialRefreshTokenAsync(CancellationToken cancellationToken) => Task.FromResult(refresh);
+			public Task<string> GetInitialRefreshTokenAsync(CancellationToken cancellationToken) => Task.FromResult(Checked(cancellationToken, refresh));
 
-			public Task SetAuthTokenAsync(AuthToken newValue, CancellationToken cancellationToken) => Task.CompletedTask;
+			public Task SetAuthTokenAsync(AuthToken newValue, CancellationToken cancellationToken)
+				=> Task.FromResult(Checked(cancellationToken, newValue));
 
-			public Task<AuthToken?> GetAuthTokenAsync(CancellationToken cancellationToken) => Task.FromResult(token);
+			public Task<AuthToken?> GetAuthTokenAsync(CancellationToken cancellationToken) => Task.FromResult(Checked(cancellationToken, token));
+
+			private static T Checked<T>(CancellationToken cancellationToken, T value)
+			{
+				cancellationToken.ThrowIfCancellationRequested();
+				return value;
+			}
 		}
 
 		private sealed class ListLogger(List<string> messages) : ILogger
@@ -40,7 +47,7 @@ namespace LightwaveRfLinkPlus.Api.Test
 			public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
 
 			public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-				=> messages.Add($"{logLevel}: {formatter(state, exception)}");
+				=> messages.Add($"{logLevel}: {formatter(state, exception)}{eventId.Name}");
 		}
 
 		private sealed class ListLoggerFactory(List<string> messages) : ILoggerFactory
@@ -53,9 +60,7 @@ namespace LightwaveRfLinkPlus.Api.Test
 
 			public void AddProvider(ILoggerProvider provider) => ArgumentNullException.ThrowIfNull(provider);
 
-			public void Dispose()
-			{
-			}
+			public void Dispose() => messages.Add("disposed");
 		}
 		private sealed class LoopbackServer : IDisposable
 		{
