@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,26 +37,38 @@ namespace LightwaveRfLinkPlus.Api.Test
 			}
 		}
 
-		private sealed class ListLogger(List<string> messages) : ILogger
+		public class ListLogger : DispatchProxy
 		{
-			public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+			private List<string> _messages = [];
+
+			public static ILogger Create(List<string> messages)
 			{
-				messages.Add($"scope {state}");
-				return null;
+				var logger = Create<ILogger, ListLogger>();
+				((ListLogger)(object)logger)._messages = messages;
+				return logger;
 			}
 
-			public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
-
-			public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-				=> messages.Add($"{logLevel}: {formatter(state, exception)}{eventId.Name}");
+			protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+			{
+				switch (targetMethod?.Name)
+				{
+					case nameof(ILogger.IsEnabled):
+						return true;
+					case nameof(ILogger.Log):
+						var text = ((Delegate)args![4]!).DynamicInvoke(args[2], args[3]);
+						_messages.Add($"{args[0]}: {text}");
+						return null;
+					default:
+						return null;
+				}
+			}
 		}
-
 		private sealed class ListLoggerFactory(List<string> messages) : ILoggerFactory
 		{
 			public ILogger CreateLogger(string categoryName)
 			{
 				messages.Add($"category {categoryName}");
-				return new ListLogger(messages);
+				return ListLogger.Create(messages);
 			}
 
 			public void AddProvider(ILoggerProvider provider) => ArgumentNullException.ThrowIfNull(provider);
