@@ -9,7 +9,6 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>LightwaveRf Lightwave RF Link Plus</PackageTags>
     <PackageReleaseNotes>Initial release</PackageReleaseNotes>
-    <Copyright>Panoramic Data Limited 2019</Copyright>
     <Authors>David Bond</Authors>
     <Company>Panoramic Data Limited</Company>
     <Description>Nuget package for the LightwaveRF Link Plus API</Description>
