@@ -2,7 +2,7 @@
 
 [![NuGet version](https://img.shields.io/nuget/v/LightwaveRfLinkPlus.Api.svg)](https://www.nuget.org/packages/LightwaveRfLinkPlus.Api/)
 
-[![Codacy Badge](https://app.codacy.com/project/badge/grade/LightwaveRfLinkPlus.Api)](https://app.codacy.com/gh/panoramicdata/LightwaveRfLinkPlus.Api/dashboard)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/4625dff6ecb14559b2db1d19a97a09cf)](https://app.codacy.com/gh/panoramicdata/LightwaveRfLinkPlus.Api/dashboard)
 
 # LightwaveRfLinkPlus.Api
 
